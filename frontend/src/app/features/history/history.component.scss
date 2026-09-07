@@ -31,6 +31,27 @@
   gap: 0.75rem;
 }
 
+.filters-card__group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filters-card__group-label {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.filters-card__date-field {
+  width: 150px;
+}
+
+.filters-card__time-field {
+  width: 110px;
+}
+
 .filters-card__count {
   margin-left: auto;
   font: var(--mat-sys-label-medium);
@@ -87,6 +108,20 @@ table {
 @media (max-width: 480px) {
   .filters-card__count {
     margin-left: 0;
+  }
+
+  .filters-card__group {
+    width: 100%;
+  }
+
+  .filters-card__group-label {
+    width: auto;
+  }
+
+  .filters-card__date-field,
+  .filters-card__time-field {
+    flex: 1 1 0;
+    width: auto;
   }
 
   .chart-card__canvas {

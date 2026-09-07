@@ -11,10 +11,12 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -23,7 +25,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { EnergyReading } from '../../core/models/energy-reading.model';
 import { CsvTimestampFormat, downloadTextFile, readingsToCsv } from '../../core/utils/csv.util';
-import { formatFilenameStamp } from '../../core/utils/date-format.util';
+import { combineDateAndTime, formatFilenameStamp } from '../../core/utils/date-format.util';
 import { ApiService } from '../../core/services/api.service';
 import { MockDataService } from '../../core/services/mock-data.service';
 import { ReadingsStoreService } from '../../core/state/readings-store.service';
@@ -40,6 +42,7 @@ const CHART_POINT_LIMIT = 300;
     DecimalPipe,
     MatButtonModule,
     MatCardModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -48,6 +51,7 @@ const CHART_POINT_LIMIT = 300;
     MatProgressSpinnerModule,
     MatSortModule,
     MatTableModule,
+    MatTimepickerModule,
     BaseChartDirective,
   ],
   templateUrl: './history.component.html',
@@ -69,13 +73,19 @@ export class HistoryComponent implements AfterViewInit {
   protected readonly error = signal<string | null>(null);
   protected readonly allReadings = signal<EnergyReading[]>([]);
 
-  /** `datetime-local` input values (empty string = unset). */
-  protected readonly fromFilter = signal('');
-  protected readonly toFilter = signal('');
+  /**
+   * Date/time filter state, split across a `mat-datepicker` (date) and a
+   * `mat-timepicker` (time) per bound, since Material doesn't offer a single
+   * combined date+time control. `null` means that half is unset.
+   */
+  protected readonly fromDate = signal<Date | null>(null);
+  protected readonly fromTime = signal<Date | null>(null);
+  protected readonly toDate = signal<Date | null>(null);
+  protected readonly toTime = signal<Date | null>(null);
 
   protected readonly filteredReadings = computed<EnergyReading[]>(() => {
-    const fromMs = this.fromFilter() ? new Date(this.fromFilter()).getTime() : null;
-    const toMs = this.toFilter() ? new Date(this.toFilter()).getTime() : null;
+    const fromMs = combineDateAndTime(this.fromDate(), this.fromTime(), 'start-of-day')?.getTime() ?? null;
+    const toMs = combineDateAndTime(this.toDate(), this.toTime(), 'end-of-day')?.getTime() ?? null;
 
     return this.allReadings().filter((reading) => {
       const t = new Date(reading.timestamp).getTime();
@@ -151,17 +161,27 @@ export class HistoryComponent implements AfterViewInit {
     });
   }
 
-  protected onFromChange(value: string): void {
-    this.fromFilter.set(value);
+  protected onFromDateChange(date: Date | null): void {
+    this.fromDate.set(date);
   }
 
-  protected onToChange(value: string): void {
-    this.toFilter.set(value);
+  protected onFromTimeChange(time: Date | null): void {
+    this.fromTime.set(time);
+  }
+
+  protected onToDateChange(date: Date | null): void {
+    this.toDate.set(date);
+  }
+
+  protected onToTimeChange(time: Date | null): void {
+    this.toTime.set(time);
   }
 
   protected clearFilters(): void {
-    this.fromFilter.set('');
-    this.toFilter.set('');
+    this.fromDate.set(null);
+    this.fromTime.set(null);
+    this.toDate.set(null);
+    this.toTime.set(null);
   }
 
   /**

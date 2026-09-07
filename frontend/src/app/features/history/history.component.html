@@ -26,25 +26,61 @@
   </header>
 
   <mat-card class="filters-card" appearance="outlined">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>From</mat-label>
-      <input
-        matInput
-        type="datetime-local"
-        [value]="fromFilter()"
-        (change)="onFromChange($any($event.target).value)"
-      />
-    </mat-form-field>
+    <div class="filters-card__group">
+      <span class="filters-card__group-label">From</span>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>To</mat-label>
-      <input
-        matInput
-        type="datetime-local"
-        [value]="toFilter()"
-        (change)="onToChange($any($event.target).value)"
-      />
-    </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters-card__date-field">
+        <input
+          matInput
+          placeholder="Date"
+          [matDatepicker]="fromDatePicker"
+          [value]="fromDate()"
+          (dateChange)="onFromDateChange($event.value)"
+        />
+        <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromDatePicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters-card__time-field">
+        <input
+          matInput
+          placeholder="Time"
+          [matTimepicker]="fromTimePicker"
+          [value]="fromTime()"
+          (valueChange)="onFromTimeChange($event)"
+        />
+        <mat-timepicker-toggle matSuffix [for]="fromTimePicker"></mat-timepicker-toggle>
+        <mat-timepicker #fromTimePicker interval="30m" />
+      </mat-form-field>
+    </div>
+
+    <div class="filters-card__group">
+      <span class="filters-card__group-label">To</span>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters-card__date-field">
+        <input
+          matInput
+          placeholder="Date"
+          [matDatepicker]="toDatePicker"
+          [value]="toDate()"
+          (dateChange)="onToDateChange($event.value)"
+        />
+        <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #toDatePicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters-card__time-field">
+        <input
+          matInput
+          placeholder="Time"
+          [matTimepicker]="toTimePicker"
+          [value]="toTime()"
+          (valueChange)="onToTimeChange($event)"
+        />
+        <mat-timepicker-toggle matSuffix [for]="toTimePicker"></mat-timepicker-toggle>
+        <mat-timepicker #toTimePicker interval="30m" />
+      </mat-form-field>
+    </div>
 
     <button mat-button (click)="clearFilters()">Clear</button>
 

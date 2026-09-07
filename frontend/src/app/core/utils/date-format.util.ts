@@ -38,3 +38,36 @@ export function formatFilenameStamp(input: string | Date = new Date()): string {
   const timePart = `${pad(date.getHours())}-${pad(date.getMinutes())}-${pad(date.getSeconds())}`;
   return `${datePart}_${timePart}`;
 }
+
+/**
+ * Merges a calendar date (day/month/year) with a time-of-day (hours/minutes/
+ * seconds), since the History page's From/To filters use a separate
+ * `mat-datepicker` and `mat-timepicker` rather than one combined control.
+ *
+ * `date` provides the day; `time` provides the hours/minutes/seconds, if
+ * set. With no date, there's nothing to filter on, so this returns `null`
+ * regardless of `time`. With a date but no time, `missingTime` decides
+ * whether the resulting instant sits at the very start of that day
+ * (`'start-of-day'`, the default — used for the "From" filter) or the very
+ * end of it (`'end-of-day'` — used for the "To" filter, so picking only a
+ * date includes every reading recorded on that day).
+ */
+export function combineDateAndTime(
+  date: Date | null,
+  time: Date | null,
+  missingTime: 'start-of-day' | 'end-of-day' = 'start-of-day',
+): Date | null {
+  if (!date) {
+    return null;
+  }
+
+  const combined = new Date(date);
+  if (time) {
+    combined.setHours(time.getHours(), time.getMinutes(), time.getSeconds(), 0);
+  } else if (missingTime === 'end-of-day') {
+    combined.setHours(23, 59, 59, 999);
+  } else {
+    combined.setHours(0, 0, 0, 0);
+  }
+  return combined;
+}
