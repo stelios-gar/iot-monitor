@@ -1,0 +1,13 @@
+<!--
+  Minimal navigation shell so the Dashboard and History pages are reachable.
+  A full Material toolbar/sidenav layout is a separate, later step.
+-->
+<nav class="app-nav">
+  <span class="app-nav__brand">{{ title }}</span>
+  <a routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
+  <a routerLink="/history" routerLinkActive="is-active">History</a>
+</nav>
+
+<main class="app-main">
+  <router-outlet />
+</main>
