@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -21,6 +22,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { EnergyReading } from '../../core/models/energy-reading.model';
+import { CsvTimestampFormat, downloadTextFile, readingsToCsv } from '../../core/utils/csv.util';
+import { formatFilenameStamp } from '../../core/utils/date-format.util';
 import { ApiService } from '../../core/services/api.service';
 import { MockDataService } from '../../core/services/mock-data.service';
 import { ReadingsStoreService } from '../../core/state/readings-store.service';
@@ -40,6 +43,7 @@ const CHART_POINT_LIMIT = 300;
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatMenuModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatSortModule,
@@ -158,5 +162,25 @@ export class HistoryComponent implements AfterViewInit {
   protected clearFilters(): void {
     this.fromFilter.set('');
     this.toFilter.set('');
+  }
+
+  /**
+   * Downloads the currently filtered readings as a CSV file.
+   * `format` picks how the Timestamp column is written: 'iso' for
+   * machine-parseable ISO 8601, 'readable' for a human-friendly
+   * YYYY/MM/DD, HH:MM:SS string.
+   */
+  protected exportCsv(format: CsvTimestampFormat): void {
+    const readings = this.filteredReadings();
+    if (!readings.length) {
+      return;
+    }
+    const stamp = formatFilenameStamp();
+    const suffix = format === 'readable' ? 'readable' : 'iso';
+    downloadTextFile(
+      readingsToCsv(readings, format),
+      `energy-readings-${suffix}-${stamp}.csv`,
+      'text/csv;charset=utf-8;',
+    );
   }
 }
