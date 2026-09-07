@@ -1,0 +1,92 @@
+<section class="history">
+  <header class="history__header">
+    <h1>History</h1>
+    <button mat-stroked-button (click)="load()" [disabled]="loading()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </header>
+
+  <mat-card class="filters-card" appearance="outlined">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>From</mat-label>
+      <input
+        matInput
+        type="datetime-local"
+        [value]="fromFilter()"
+        (change)="onFromChange($any($event.target).value)"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>To</mat-label>
+      <input
+        matInput
+        type="datetime-local"
+        [value]="toFilter()"
+        (change)="onToChange($any($event.target).value)"
+      />
+    </mat-form-field>
+
+    <button mat-button (click)="clearFilters()">Clear</button>
+
+    <span class="filters-card__count">
+      {{ filteredReadings().length }} of {{ allReadings().length }} readings
+    </span>
+  </mat-card>
+
+  @if (loading()) {
+    <div class="state-row">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (error()) {
+    <mat-card class="state-row state-row--error" appearance="outlined">{{ error() }}</mat-card>
+  } @else {
+    <mat-card class="chart-card" appearance="outlined">
+      <span class="chart-card__title">Power over time</span>
+      <div class="chart-card__canvas">
+        @if (filteredReadings().length) {
+          <canvas baseChart [data]="chartData()" [options]="chartOptions" type="line"></canvas>
+        } @else {
+          <p class="chart-card__empty">No readings in range.</p>
+        }
+      </div>
+    </mat-card>
+
+    <mat-card class="table-card" appearance="outlined">
+      <div class="table-scroll">
+        <table mat-table [dataSource]="dataSource" matSort>
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Timestamp</th>
+            <td mat-cell *matCellDef="let r">{{ r.timestamp | date: 'medium' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="voltage">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Voltage (V)</th>
+            <td mat-cell *matCellDef="let r">{{ r.voltage | number: '1.2-2' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="current">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Current (mA)</th>
+            <td mat-cell *matCellDef="let r">{{ r.current | number: '1.1-1' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="power">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Power (mW)</th>
+            <td mat-cell *matCellDef="let r">{{ r.power | number: '1.1-1' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="payloadSize">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payload (bytes)</th>
+            <td mat-cell *matCellDef="let r">{{ r.payloadSize }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" pageSize="25" showFirstLastButtons />
+    </mat-card>
+  }
+</section>
