@@ -1,13 +1,37 @@
-<!--
-  Minimal navigation shell so the Dashboard and History pages are reachable.
-  A full Material toolbar/sidenav layout is a separate, later step.
--->
-<nav class="app-nav">
-  <span class="app-nav__brand">{{ title }}</span>
-  <a routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
-  <a routerLink="/history" routerLinkActive="is-active">History</a>
-</nav>
+<mat-sidenav-container class="app-shell">
+  <mat-sidenav
+    #sidenav
+    class="app-shell__sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+  >
+    <mat-nav-list>
+      @for (link of navLinks; track link.path) {
+        <a
+          mat-list-item
+          [routerLink]="link.path"
+          routerLinkActive="is-active"
+          (click)="closeIfOverlay(sidenav)"
+        >
+          <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+          <span matListItemTitle>{{ link.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
 
-<main class="app-main">
-  <router-outlet />
-</main>
+  <mat-sidenav-content class="app-shell__content">
+    <mat-toolbar class="app-shell__toolbar">
+      @if (sidenavMode() === 'over') {
+        <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle navigation menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <span class="app-shell__title">{{ title }}</span>
+    </mat-toolbar>
+
+    <main class="app-shell__main">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

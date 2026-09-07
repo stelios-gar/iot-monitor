@@ -21,6 +21,6 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.app-nav__brand')?.textContent).toContain('IoT Energy Monitor');
+    expect(compiled.querySelector('.app-shell__title')?.textContent).toContain('IoT Energy Monitor');
   });
 });
