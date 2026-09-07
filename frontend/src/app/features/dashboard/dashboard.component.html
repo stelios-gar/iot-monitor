@@ -1,0 +1,68 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <h1>Live Dashboard</h1>
+
+    <div class="dashboard__controls">
+      <mat-chip-set>
+        <mat-chip [class]="'status-chip status-chip--' + connectionStatus()">
+          <mat-icon matChipAvatar>
+            {{ mode() === 'mock' ? 'science' : 'sensors' }}
+          </mat-icon>
+          {{ statusLabel() }}
+        </mat-chip>
+      </mat-chip-set>
+
+      <mat-button-toggle-group
+        [value]="mode()"
+        (change)="setMode($event.value)"
+        aria-label="Data source"
+      >
+        <mat-button-toggle value="mock">Simulated</mat-button-toggle>
+        <mat-button-toggle value="live">Live (RP2350)</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </header>
+
+  <div class="kpi-grid">
+    <mat-card class="kpi-card" appearance="outlined">
+      <span class="kpi-card__label">Voltage</span>
+      <span class="kpi-card__value">
+        {{ (latest()?.voltage | number: '1.2-2') ?? '—' }}<span class="kpi-card__unit">V</span>
+      </span>
+    </mat-card>
+
+    <mat-card class="kpi-card" appearance="outlined">
+      <span class="kpi-card__label">Current</span>
+      <span class="kpi-card__value">
+        {{ (latest()?.current | number: '1.1-1') ?? '—' }}<span class="kpi-card__unit">mA</span>
+      </span>
+    </mat-card>
+
+    <mat-card class="kpi-card" appearance="outlined">
+      <span class="kpi-card__label">Power</span>
+      <span class="kpi-card__value">
+        {{ (latest()?.power | number: '1.1-1') ?? '—' }}<span class="kpi-card__unit">mW</span>
+      </span>
+    </mat-card>
+
+    <mat-card class="kpi-card" appearance="outlined">
+      <span class="kpi-card__label">Payload</span>
+      <span class="kpi-card__value">
+        {{ latest()?.payloadSize ?? '—' }}<span class="kpi-card__unit">bytes</span>
+      </span>
+    </mat-card>
+  </div>
+
+  <mat-card class="chart-card" appearance="outlined">
+    <span class="chart-card__title">
+      Power &amp; payload size (last {{ store.liveReadings().length }} readings)
+    </span>
+    <div class="chart-card__canvas">
+      @if (store.liveReadings().length) {
+        <canvas baseChart [data]="$any(chartData())" [options]="chartOptions" type="line"></canvas>
+      } @else {
+        <p class="chart-card__empty">Waiting for readings…</p>
+      }
+    </div>
+  </mat-card>
+</section>
