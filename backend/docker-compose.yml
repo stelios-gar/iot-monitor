@@ -1,0 +1,29 @@
+# Spins up the Postgres instance the backend expects, pre-configured with
+# credentials matching application.properties' defaults — so `docker
+# compose up -d` followed by `./run.sh` (or `./run.sh spring-boot:run`)
+# works right after cloning, with no manual setup.
+#
+# To use different credentials, either export DB_NAME/DB_USERNAME/DB_PASSWORD
+# before running this file, or drop them in a .env file next to it — and
+# set the matching DB_* variables for the Spring app too (see README.md).
+services:
+  postgres:
+    image: postgres:18
+    container_name: iot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-iot_monitor}
+      POSTGRES_USER: ${DB_USERNAME:-iotuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-iotpass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - iot-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-iotuser} -d ${DB_NAME:-iot_monitor}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  iot-postgres-data:
