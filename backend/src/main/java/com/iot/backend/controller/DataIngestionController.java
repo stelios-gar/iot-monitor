@@ -7,6 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Receives the RP2350 hub's energy measurement for one transmission.
+ *
+ * This is the second half of the hub's per-transmission workflow: it
+ * first POSTs the actual payload to {@link StreamController}, measures
+ * the voltage/current that transmission cost, then reports that
+ * measurement here as an {@link EnergyReading}. Invalid payloads are
+ * rejected with a 400 and a field-by-field explanation — see
+ * {@link com.iot.backend.exception.GlobalExceptionHandler}.
+ */
 @RestController
 @RequestMapping("/api/data")
 @RequiredArgsConstructor
