@@ -77,6 +77,35 @@
 			<artifactId>spring-boot-starter-websocket-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<!-- In-memory DB for tests, so `./mvnw test` runs with no Postgres/Docker required. -->
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!--
+			 Provides Mockito/AssertJ/JUnit Jupiter, which the granular
+			 *-test starters above don't bring in on their own. Its
+			 transitive spring-boot-test-autoconfigure is excluded because
+			 it resolves to a stale pre-4.x version (3.5.3) that ships
+			 @WebMvcTest/@DataJpaTest under their OLD package names,
+			 conflicting with the real 4.1.0 versions of those annotations
+			 already provided by spring-boot-starter-webmvc-test and
+			 spring-boot-starter-data-jpa-test above (see their new
+			 packages: org.springframework.boot.webmvc.test.autoconfigure
+			 and org.springframework.boot.data.jpa.test.autoconfigure).
+			-->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-test-autoconfigure</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
